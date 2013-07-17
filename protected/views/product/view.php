@@ -13,7 +13,11 @@ $this->menu=array(
 );
 ?>
 
-<h4>Плановая калькуляция продукта</h4>
+<h4>Плановая калькуляция <?php
+    if ($model->is_folder == 1) echo 'группы';
+    elseif ($model->is_semiproduct == 1) echo 'полуфабриката';
+    else echo 'продукта';
+?></h4>
 
 <h3><?php echo $model->name; ?></h3>
 
@@ -59,5 +63,12 @@ $this->menu=array(
         'label'=>'Изменить',
         'icon'=>'pencil',
         'url'=>Yii::app()->createUrl("product/update", array("id"=>$model->id)),
+    ));
+?>
+<?php
+    $this->widget('bootstrap.widgets.TbButton', array(
+        'label'=>'К списку',
+        'icon'=>'list',
+        'url'=>Yii::app()->createUrl("product/index", array("parent_id"=>$model->parent_id)),
     ));
 ?>

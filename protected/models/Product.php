@@ -36,6 +36,16 @@ class Product extends CActiveRecord
 		return 'price_products';
 	}
     
+    public function isGroup()
+	{
+		if ($this->is_folder == 1) return true; else false;
+	}
+    
+    public function isProduct()
+	{
+		if ($this->is_semiproduct == 0) return true; else false;
+	}
+    
     public function calculate(){
         
         $this->cost = array(
@@ -79,7 +89,7 @@ class Product extends CActiveRecord
 		return array(
 			array('fix_cost', 'numerical', 'integerOnly'=>true),
 			array('parent_id, count', 'length', 'max'=>11),
-			array('is_folder, is_active', 'length', 'max'=>1),
+			array('is_folder, is_active, is_semiproduct', 'length', 'max'=>1),
 			array('name', 'length', 'max'=>255),
 			array('price, profit, fcost, vcost', 'length', 'max'=>10),
 			// The following rule is used by search().
@@ -97,6 +107,7 @@ class Product extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
             'processes' => array(self::MANY_MANY, 'ProductionProcess', 'price_product_calculation(product_id,calculation_id)'),
+            'parent' => array(self::HAS_ONE, 'Product', array('id'=>'parent_id')),
 		);
 	}
 
@@ -107,10 +118,11 @@ class Product extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'parent_id' => 'Parent',
+			'parent_id' => 'Группа',
 			'is_folder' => 'Is Folder',
+			'is_semiproduct' => 'Is Semiproduct',
 			'is_active' => 'Is Active',
-			'name' => 'Продукт',
+			'name' => 'Название',
 			'count' => 'Плановый тираж',
 			'price' => 'Плановая цена',
 			'profit' => 'Плановая наценка',

@@ -1,6 +1,6 @@
 <?php
 
-class ProductController extends Controller
+class ProductProductionProcessController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -31,7 +31,7 @@ class ProductController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','autoCompleteLookup'),
+				'actions'=>array('create','update'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -44,39 +44,16 @@ class ProductController extends Controller
 		);
 	}
 
-	public function actionAutoCompleteLookup()
-	{
-        if(Yii::app()->request->isAjaxRequest && isset($_GET['q'])){
-            /* q is the default GET variable name that is used by
-            / the autocomplete widget to pass in user input
-            */
-          $name = $_GET['q']; 
-                    // this was set with the "max" attribute of the CAutoComplete widget
-          $limit = min($_GET['limit'], 50); 
-          $criteria = new CDbCriteria;
-          $criteria->condition = "name LIKE :sterm";
-          if (isset($_GET['onlyItems'])) $criteria->condition .= " AND is_folder='".$_GET['onlyItems']."'";
-          $criteria->params = array(":sterm"=>"%$name%");
-          $criteria->limit = $limit;
-          $dataArray = Product::model()->findAll($criteria);
-          $returnVal = '';
-          foreach($dataArray as $data)
-          {
-             $returnVal .= $data->getAttribute('name').'|'.$data->getAttribute('id')."\n";
-          }
-          echo $returnVal;
-       }
-    }
-    
-    /**
+	/**
 	 * Displays a particular model.
 	 * @param integer $id the ID of the model to be displayed
 	 */
 	public function actionView($id)
 	{
-		$this->render('view',array(
-			'model'=>$this->loadModel($id),
-		));
+		if(Yii::app()->request->isAjaxRequest)
+			$this->renderPartial('view',array('model'=>$this->loadModel($id)));
+		else
+			$this->render('view',array('model'=>$this->loadModel($id)));
 	}
 
 	/**
@@ -85,14 +62,14 @@ class ProductController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Product;
+		$model=new ProductProductionProcess;
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
-
-		if(isset($_POST['Product'])){
-			$model->attributes=$_POST['Product'];
-            if($model->save()){
+		
+		if(isset($_POST['ProductProductionProcess'])){
+			$model->attributes=$_POST['ProductProductionProcess'];
+			if($model->save()){
 				if(Yii::app()->request->isAjaxRequest){
 					echo 'success';
 					Yii::app()->end();
@@ -102,12 +79,8 @@ class ProductController extends Controller
 				}
 			}
 		}
-		if(Yii::app()->request->isAjaxRequest){
-			if (isset($_GET['isFolder'])) $model->is_folder = $_GET['isFolder'];
-            if (isset($_GET['isSemiproduct'])) $model->is_semiproduct = $_GET['isSemiproduct'];
-            if (isset($_GET['parent_id'])) $model->parent_id = $_GET['parent_id'];
-			$this->renderPartial('create',array('model'=>$model), false, true);
-        }
+		if(Yii::app()->request->isAjaxRequest)
+			$this->renderPartial('_form',array('model'=>$model), false, true);
 		else
 			$this->render('create',array('model'=>$model));
 	}
@@ -124,19 +97,24 @@ class ProductController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['Product']))
+		if(isset($_POST['ProductProductionProcess']))
 		{
-			$model->attributes=$_POST['Product'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			$model->attributes=$_POST['ProductProductionProcess'];
+			if($model->save()) {
+				if(Yii::app()->request->isAjaxRequest){
+					echo 'success';
+					Yii::app()->end();
+				}
+				else {
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}
 		}
-
-        foreach ($model->processes as $process)
-            $process->calculate();
-
-		$this->render('update',array(
-			'model'=>$model,
-		));
+		if(Yii::app()->request->isAjaxRequest)
+			$this->renderPartial('_form',array('model'=>$model), false, true);
+        
+		else
+			$this->render('update',array('model'=>$model));
 	}
 
 	/**
@@ -164,32 +142,10 @@ class ProductController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$id = isset($_GET['parent_id']) ? $_GET['parent_id'] : 0;
-        
-        if ($id != 0) $model = $this->loadModel($id);
-        
-        if ($model->is_folder || $id == 0) {
-            $dataProvider=new CActiveDataProvider('Product', array(
-                'criteria'=>array(
-                    'condition'=>'parent_id = '.$id,
-                    'order'=>'is_folder DESC, name',
-                ),
-                'pagination'=>array(
-                    'pageSize'=>20,
-                ),
-            ));
-            if ($model) {
-                $breadcrumbs = $model->breadcrumbs();
-            }
-            $this->render('index',array(
-                'dataProvider'=>$dataProvider,
-                'breadcrumbs'=>$breadcrumbs,
-                'parent_id'=>$id,
-            ));
-        }
-        else {
-            $this->redirect(array('view','id'=>$id));
-        }        
+		$dataProvider=new CActiveDataProvider('ProductProductionProcess');
+		$this->render('index',array(
+			'dataProvider'=>$dataProvider,
+		));
 	}
 
 	/**
@@ -197,10 +153,10 @@ class ProductController extends Controller
 	 */
 	public function actionAdmin()
 	{
-		$model=new Product('search');
+		$model=new ProductProductionProcess('search');
 		$model->unsetAttributes();  // clear any default values
-		if(isset($_GET['Product']))
-			$model->attributes=$_GET['Product'];
+		if(isset($_GET['ProductProductionProcess']))
+			$model->attributes=$_GET['ProductProductionProcess'];
 
 		$this->render('admin',array(
 			'model'=>$model,
@@ -214,15 +170,7 @@ class ProductController extends Controller
 	 */
 	public function loadModel($id)
 	{
-		$model=Product::model()->findByPk($id);
-		if($model===null)
-			throw new CHttpException(404,'The requested page does not exist.');
-		return $model;
-	}
-    
-    public function loadModels(&$criteria)
-	{
-		$model=Product::model()->findAll($criteria);
+		$model=ProductProductionProcess::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
@@ -234,7 +182,7 @@ class ProductController extends Controller
 	 */
 	protected function performAjaxValidation($model)
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='product-form')
+		if(isset($_POST['ajax']) && $_POST['ajax']==='product-production-process-form')
 		{
 			echo CActiveForm::validate($model);
 			Yii::app()->end();

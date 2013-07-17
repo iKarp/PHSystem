@@ -31,7 +31,7 @@ class ProductionProcessController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update','autoCompleteLookup'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -43,6 +43,30 @@ class ProductionProcessController extends Controller
 			),
 		);
 	}
+    
+    public function actionAutoCompleteLookup()
+	{
+        if(Yii::app()->request->isAjaxRequest && isset($_GET['q'])){
+            /* q is the default GET variable name that is used by
+            / the autocomplete widget to pass in user input
+            */
+          $name = $_GET['q']; 
+                    // this was set with the "max" attribute of the CAutoComplete widget
+          $limit = min($_GET['limit'], 50); 
+          $criteria = new CDbCriteria;
+          $criteria->condition = "name LIKE :sterm";
+          if (isset($_GET['onlyItems'])) $criteria->condition .= " AND is_folder='".$_GET['onlyItems']."'";
+          $criteria->params = array(":sterm"=>"%$name%");
+          $criteria->limit = $limit;
+          $dataArray = ProductionProcess::model()->findAll($criteria);
+          $returnVal = '';
+          foreach($dataArray as $data)
+          {
+             $returnVal .= $data->getAttribute('name').'|'.$data->getAttribute('id')."\n";
+          }
+          echo $returnVal;
+       }
+    }
 
 	/**
 	 * Displays a particular model.
@@ -189,8 +213,8 @@ class ProductionProcessController extends Controller
 			throw new CHttpException(404,'The requested page does not exist.');
 		return $model;
 	}
-
-	/**
+    
+    /**
 	 * Performs the AJAX validation.
 	 * @param CModel the model to be validated
 	 */

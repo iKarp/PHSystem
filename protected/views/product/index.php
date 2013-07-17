@@ -1,13 +1,6 @@
-<?php
-$this->breadcrumbs=array(
-	'Products',
-);
+<?php $this->beginWidget('bootstrap.widgets.TbModal', array('id'=>'TBDialogCrud')); ?>
+<?php $this->endWidget(); ?>
 
-$this->menu=array(
-	array('label'=>'Create Product','url'=>array('create')),
-	array('label'=>'Manage Product','url'=>array('admin')),
-);
-?>
 
 <h3>Справочник продуктов</h3>
 <div><?php echo $path; ?></div>
@@ -44,7 +37,7 @@ $this->menu=array(
             ),
             array(
                 'class'=>'bootstrap.widgets.TbButtonColumn',
-                //'template'=>'{view}{update}',
+                'template'=>'{update}',
                 /*'buttons'=>array(
                     'view' => array(
                         'url'=>'Yii::app()->createUrl("product/view", array("id"=>$data->id))',  
@@ -57,10 +50,44 @@ $this->menu=array(
 ?>
 
 <?php
-    $this->widget('bootstrap.widgets.TbButton', array(
-        //'type'=>'link',
-        'label'=>'Продукт',
-        'icon'=>'plus',
-        'url'=>Yii::app()->createUrl("product/create", array("parent_id"=>$model->parent_id)),
+    $this->widget('bootstrap.widgets.TbButtonGroup', array(
+        'buttons'=>array(
+            array(
+                'label'=>'Добавить',
+                'icon'=>'plus',
+                'items'=>array(
+                    array(
+                        'label'=>'Продукт',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("product/create", array("parent_id"=>$parent_id)),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                    array(
+                        'label'=>'Полуфабрикат',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("product/create", array("parent_id"=>$parent_id,"isSemiproduct"=>'1')),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                    array(
+                        'label'=>'Группу',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("product/create", array("parent_id"=>$parent_id,"isFolder"=>'1')),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
     ));
 ?>

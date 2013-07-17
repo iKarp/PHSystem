@@ -13,7 +13,11 @@ $this->menu=array(
 );
 ?>
 
-<h4>Изменение продукта</h4>
+<h4>Изменение <?php
+        if ($model->is_folder == 1) echo 'группы';
+        elseif ($model->is_semiproduct == 1) echo 'полуфабриката';
+        else echo 'продукта';
+    ?></h4>
 
 <br />
 

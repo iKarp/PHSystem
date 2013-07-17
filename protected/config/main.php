@@ -10,7 +10,7 @@ Yii::setPathOfAlias('nls', dirname(__FILE__).'/../extensions/nls');
 // CWebApplication properties can be configured here.
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
-	'name'=>'My Web Application',
+	'name'=>'Print House System',
     'language' => 'ru',
 	// preloading 'log' component
 	'preload'=>array(

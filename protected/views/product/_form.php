@@ -1,22 +1,56 @@
+<?php $this->beginWidget('bootstrap.widgets.TbModal', array('id'=>'TBDialogCrud')); ?>
+<?php $this->endWidget(); ?>
+
+
 <?php $form=$this->beginWidget('bootstrap.widgets.TbActiveForm',array(
 	'id'=>'product-form',
 	'enableAjaxValidation'=>false,
     'type'=>'horizontal',
+    'htmlOptions'=>array('class'=>'well'),
 )); ?>
 
 	<?php echo $form->errorSummary($model); ?>
 
-	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>255)); ?>
+    <?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>255)); ?>
 
-	<?php echo $form->textFieldRow($model,'count',array('class'=>'span5','maxlength'=>11)); ?>
+    <div class="control-group ">
+            <?php echo $form->label($model, 'parent_id', array('class'=>'control-label')); ?>
+            <div class="controls">
+                <?php $this->widget('CAutoComplete', array(
+                    'name'=>'parent_name',
+                    'url'=>$this->createUrl('product/autoCompleteLookup'),
+                    'max'=>9, //specifies the max number of items to display
+                    'minChars'=>3,
+                    'delay'=>500, //number of milliseconds before lookup occurs
+                    'matchCase'=>false, //match case when performing a lookup?
+                    'htmlOptions'=>array('class'=>'span5','placeholder'=>$model->parent->name),
+                    'methodChain'=>".result(function(event,item){\$(\"#Product_parent_id\").val(item[1]);})",
+                )); ?>
+                <?php echo $form->hiddenField($model,'parent_id'); ?>
+            </div>
+        </div>
 
-	<?php echo $form->textFieldRow($model,'price',array('class'=>'span5','maxlength'=>10)); ?>
+    <?php if ($model->isProduct()): ?>
 
-	<?php echo $form->textFieldRow($model,'profit',array('class'=>'span5','maxlength'=>10)); ?>
+        <?php echo $form->textFieldRow($model,'count',array('class'=>'span5','maxlength'=>11)); ?>
 
-	<?php echo $form->textFieldRow($model,'fcost',array('class'=>'span5','maxlength'=>10)); ?>
+        <?php echo $form->textFieldRow($model,'price',array('class'=>'span5','maxlength'=>10)); ?>
 
-	<?php echo $form->textFieldRow($model,'vcost',array('class'=>'span5','maxlength'=>10)); ?>
+        <?php echo $form->textFieldRow($model,'profit',array('class'=>'span5','maxlength'=>10)); ?>
+
+        <?php echo $form->textFieldRow($model,'fcost',array('class'=>'span5','maxlength'=>10)); ?>
+
+        <?php echo $form->textFieldRow($model,'vcost',array('class'=>'span5','maxlength'=>10)); ?>
+
+    <?php else: ?>
+
+        <?php echo $form->textFieldRow($model,'count',array(
+            'class'=>'span5',
+            'maxlength'=>11,
+            'labelOptions' => array('label' => 'Тех. экземпляры, шт')));
+        ?>
+
+    <?php endif; ?>
 
 	<?php
     $processes = new CArrayDataProvider($model->processes);
@@ -46,10 +80,14 @@
 
     <?php
     $this->widget('bootstrap.widgets.TbButton', array(
-        //'type'=>'link',
-        'label'=>'Техпроцесс',
+        'buttonType'=>'ajaxButton',
+        'label'=>'Добавить',
         'icon'=>'plus',
-        'url'=>Yii::app()->createUrl("product/create", array("parent_id"=>$model->parent_id)),
+        'url'=>Yii::app()->createUrl("productProductionProcess/create", array("product_id"=>$model->id)),
+        'ajaxOptions'=>array(
+			'url'=>$this->createUrl('create'),
+			'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+		),
     ));
     ?>
 
@@ -59,8 +97,11 @@
 			'type'=>'primary',
 			'label'=>$model->isNewRecord ? 'Создать' : 'Сохранить',
 		)); ?>
+        <?php if (!$model->isNewRecord) $this->widget('bootstrap.widgets.TbButton', array(
+			//'buttonType'=>'submit',
+			'type'=>'danger',
+			'label'=>'Удалить',
+		)); ?>
 	</div>
-
-    
 
 <?php $this->endWidget(); ?>
