@@ -5,12 +5,33 @@
 	'id'=>'production-process-form',
 	'enableAjaxValidation'=>false,
     'htmlOptions'=>array('class'=>'well'),
+    'type'=>'horizontal',
     //'type'=>'horizontal',
 )); ?>
 
 	<?php echo $form->errorSummary($model); ?>
 
     <?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>255)); ?>
+
+    <div class="control-group ">
+            <?php echo $form->label($model, 'parent_id', array('class'=>'control-label')); ?>
+            <div class="controls">
+                <?php $this->widget('CAutoComplete', array(
+                    'name'=>'parent_name',
+                    'url'=>$this->createUrl('productionProcess/autoCompleteLookup', array('is_folder'=>1)),
+                    'max'=>9, //specifies the max number of items to display
+                    'minChars'=>3,
+                    'delay'=>500, //number of milliseconds before lookup occurs
+                    'matchCase'=>false, //match case when performing a lookup?
+                    'htmlOptions'=>array('class'=>'span5', 'placeholder'=>'Выберите из списка', ),
+                    'value'=>$model->parent->name,
+                    'methodChain'=>".result(function(event,item){\$(\"#ProductionProcess_parent_id\").val(item[1]);})",
+                )); ?>
+                <?php echo $form->hiddenField($model,'parent_id'); ?>
+            </div>
+        </div>
+
+    <?php if (!$model->isGroup()): ?>
 
     <?php
     $materials = new CArrayDataProvider($model->materials);
@@ -98,10 +119,23 @@
             array('name'=>'price_count', 'header'=>'Количество'),
             array(
                 'class'=>'bootstrap.widgets.TbButtonColumn',
-                'template'=>'{view} {delete}',
+                'template'=>'{view}{update}{delete}',
                 'buttons'=>array(
                     'view' => array(
                         'url'=>'Yii::app()->createUrl("productionProcess/view", array("id"=>$data->price_id))',  
+                    ),
+                    'update' => array(
+                        'url'=>'Yii::app()->createUrl("productionProcessSubprocess/update", array("id"=>$data->id))',
+                        'click'=>'function(){
+                            var url = $(this).attr("href");
+                            $.get(url, function(r){
+                                $("#TBDialogCrud").html(r).modal("show");
+                            });
+                            return false;
+                        }',
+                    ),
+                    'delete' => array(
+                        'url'=>'Yii::app()->createUrl("productionProcessSubprocess/delete", array("id"=>$data->id))',  
                     ),
                 ),
             ),
@@ -120,11 +154,23 @@
     ));
     ?>
 
+    <?php endif; ?>
+
 	<div class="form-actions">
 		<?php $this->widget('bootstrap.widgets.TbButton', array(
 			'buttonType'=>'submit',
 			'type'=>'primary',
 			'label'=>$model->isNewRecord ? 'Создать' : 'Сохранить',
+		)); ?>
+        <?php if (!$model->isNewRecord) $this->widget('bootstrap.widgets.TbButton', array(
+			//'buttonType'=>'submit',
+			'type'=>'danger',
+			'label'=>'Удалить',
+            'url'=>Yii::app()->createUrl("productionProcess/delete", array(
+                'id'=>$model->id,
+                'returnUrl'=>Yii::app()->createUrl("productionProcess/index", array("parent_id"=>$model->parent_id)),
+            )),
+            //'htmlOptions'=>array('class'=>'span2'),
 		)); ?>
         <?php $this->widget('bootstrap.widgets.TbButton', array(
 			'buttonType'=>'submit',

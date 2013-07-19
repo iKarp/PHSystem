@@ -38,11 +38,12 @@
             array(
                 'class'=>'bootstrap.widgets.TbButtonColumn',
                 'template'=>'{update}',
-                /*'buttons'=>array(
-                    'view' => array(
-                        'url'=>'Yii::app()->createUrl("product/view", array("id"=>$data->id))',  
+                'buttons'=>array(
+                    'update' => array(
+                        //'icon'=>'($data->is_folder) ? "pencil" : "plus"',
+                        //'url'=>'Yii::app()->createUrl("product/view", array("id"=>$data->id))',
                     ),
-                ),*/
+                ),
 
             )
         ),

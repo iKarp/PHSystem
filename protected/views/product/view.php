@@ -14,47 +14,63 @@ $this->menu=array(
 ?>
 
 <h4>Плановая калькуляция <?php
-    if ($model->is_folder == 1) echo 'группы';
-    elseif ($model->is_semiproduct == 1) echo 'полуфабриката';
+    if ($model->isGroup()) echo 'группы';
+    elseif ($model->isSemiproduct()) echo 'полуфабриката';
     else echo 'продукта';
 ?></h4>
 
 <h3><?php echo $model->name; ?></h3>
 
-<?php $this->widget('bootstrap.widgets.TbDetailView',array(
-	'data'=>$model,
-	'attributes'=>array(
-		'count',
-		'price',
-		'profit',
-		'fcost',
-		'vcost',
-	),
-)); ?>
+<?php
+    $fields = array(
+		array(
+            'label'=>($model->isSemiproduct()) ? 'Тех. экземпляры' : 'Плановый тираж',
+            'value'=>$model->count,
+        ),
+		'cost.fix',
+		'cost.var',
+        'cost.total',
+	);
+    $this->widget('bootstrap.widgets.TbDetailView',array(
+        'data'=>$model,
+        'attributes'=>$fields,
+    ));
+?>
+
+
+<?php if ($model->isProduct()): ?>
+
+    <?php
+            $semiproducts = new CArrayDataProvider($model->semiproducts);
+            $this->widget('bootstrap.widgets.TbGridView', array(
+                'type'=>'striped condensed',
+                'dataProvider'=>$semiproducts,
+                'template'=>"{items}",
+                'columns'=>array(
+                    array('name'=>'label', 'header'=>'Компоненты'),
+                    array('name'=>'semiproduct.name', 'header'=>'Полуфабрикат'),
+                    array('name'=>'count', 'header'=>'Кол-во', 'htmlOptions'=>array('width'=>'80')),
+                    array('value'=>'sprintf("%.6f",$data->semiproduct->cost["var"])', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100')),
+                    array('value'=>'sprintf("%.6f",$data->semiproduct->cost["fix"])', 'header'=>'Техпроцесс', 'htmlOptions'=>array('width'=>'120')),
+                    array('value'=>'sprintf("%.6f",$data->semiproduct->cost["total"])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
+                ),
+            ));
+    ?>
+
+<?php endif; ?>
 
 <?php
     $processes = new CArrayDataProvider($model->processes);
+    $colums = array(array('name'=>'process.name', 'header'=>'Технологические процессы'));
+    if ($model->isProduct()) $colums[] = array('name'=>'count', 'header'=>'Кол-во', 'htmlOptions'=>array('width'=>'80'));
+    $colums[] = array('value'=>'sprintf("%.6f",$data->process->cost["var"])', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100'));
+    $colums[] = array('value'=>'sprintf("%.6f",$data->process->cost["fix"])', 'header'=>'Техпроцесс', 'htmlOptions'=>array('width'=>'120'));
+    if ($model->isProduct()) $colums[] = array('value'=>'sprintf("%.6f",$data->process->cost["total"])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120'));
     $this->widget('bootstrap.widgets.TbGridView', array(
         'type'=>'striped condensed',
         'dataProvider'=>$processes,
         'template'=>"{items}",
-        'columns'=>array(
-            array('name'=>'name', 'header'=>'Технологические процессы'),
-            /*array('name'=>'price_count', 'header'=>'Количество'),
-            array('value'=>'sprintf("%.6f",$data->process->cost["var"])', 'header'=>'Цена'),
-            array('value'=>'sprintf("%.6f",$data->process->cost["fix"])', 'header'=>'Соп. техпроцессы'),
-            array('value'=>'sprintf("%.6f",$data->cost)', 'header'=>'Сумма'),
-            array(
-                'class'=>'bootstrap.widgets.TbButtonColumn',
-                'template'=>'{view}',
-                'buttons'=>array(
-                    'view' => array(
-                        'url'=>'Yii::app()->createUrl("productionProcess/view", array("id"=>$data->price_id))',  
-                    ),
-                ),
-
-            )*/
-        ),
+        'columns'=>$colums,
     ));
 ?>
 

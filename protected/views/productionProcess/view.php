@@ -81,3 +81,11 @@ $this->menu=array(
         'url'=>Yii::app()->createUrl("productionProcess/update", array("id"=>$model->id)),
     ));
 ?>
+
+<?php
+    $this->widget('bootstrap.widgets.TbButton', array(
+        'label'=>'К списку',
+        'icon'=>'list',
+        'url'=>Yii::app()->createUrl("productionProcess/index", array("parent_id"=>$model->parent_id)),
+    ));
+?>

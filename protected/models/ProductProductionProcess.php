@@ -29,6 +29,12 @@ class ProductProductionProcess extends CActiveRecord
 	{
 		return 'price_product_calculation';
 	}
+    
+    public function calculate(){
+        
+        $this->process->calculate();
+        
+    }
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -38,9 +44,11 @@ class ProductProductionProcess extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('product_id, calculation_id', 'required'),
+			array('product_id, calculation_id, count', 'required'),
 			array('product_id, calculation_id', 'length', 'max'=>11),
 			array('fcost, vcost', 'length', 'max'=>14),
+            array('product_id, calculation_id', 'numerical', 'integerOnly'=>true),
+            array('count', 'numerical', 'integerOnly'=>false),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
 			array('id, product_id, calculation_id, fcost, vcost', 'safe', 'on'=>'search'),
@@ -55,7 +63,8 @@ class ProductProductionProcess extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-            'product' => array(self::HAS_ONE, 'Product', array('product_id'=>'id')),
+            'product' => array(self::BELONGS_TO, 'Product', array('product_id'=>'id')),
+            'process' => array(self::HAS_ONE, 'ProductionProcess', array('id'=>'calculation_id')),
 		);
 	}
 
@@ -70,6 +79,13 @@ class ProductProductionProcess extends CActiveRecord
 			'calculation_id' => 'Технологический процесс',
 			'fcost' => 'Fcost',
 			'vcost' => 'Vcost',
+            'cost.materials' => 'Материалы',
+            'cost.overhead' => 'Накладные расходы',
+            'cost.operations' => 'ФОТ',
+            'cost.taxSalary' => 'Налог с ФОТ',
+            'cost.var' => 'Единица продукции',
+            'cost.fix' => 'Соп. техпроцессы',
+            'count' => 'Кол-во',
 		);
 	}
 

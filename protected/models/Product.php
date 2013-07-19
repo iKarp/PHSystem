@@ -23,6 +23,8 @@ class Product extends CActiveRecord
 	 * @param string $className active record class name.
 	 * @return Product the static model class
 	 */
+    public $cost;
+    
 	public static function model($className=__CLASS__)
 	{
 		return parent::model($className);
@@ -43,27 +45,49 @@ class Product extends CActiveRecord
     
     public function isProduct()
 	{
-		if ($this->is_semiproduct == 0) return true; else false;
+		if ($this->is_semiproduct == 0 && $this->is_folder == 0) return true; else false;
+	}
+    
+    public function isSemiproduct()
+	{
+		if ($this->is_semiproduct == 1 && $this->is_folder == 0) return true; else false;
 	}
     
     public function calculate(){
         
         $this->cost = array(
-            'materials' => 0,
-            'operations' => 0,
+            'var' => 0,
             'fix' => 0,
         );
         
-        foreach ($this->processes as $process) {
-            $process->calculate();
-            $this->cost['fix'] += $process->cost['fix'];
+        foreach ($this->processes as $item) {
+            if ($this->isProduct()) {
+                $item->process->calculateCount($this->count * $item->count);
+                $this->cost['var'] += $item->count * $item->process->cost['var'];
+            }
+            else {
+                $item->process->calculate();
+                $this->cost['var'] += $item->process->cost['var'];
+            }
+            
+            $this->cost['fix'] += $item->process->cost['fix'];
         }
         
-        $this->cost['overhead'] = $this->cost['materials'] * Yii::app()->params['overheadCost'] / 100;
-        $this->cost['taxSalary'] = $this->cost['operations'] * Yii::app()->params['taxSalary'] / 100;
-        $this->cost['var'] = $this->cost['operations'] + $this->cost['taxSalary'] + $this->cost['materials'] + $this->cost['overhead'];
+        if ($this->isProduct()) foreach ($this->semiproducts as $item) {
+            $item->semiproduct->calculateCount($this->count * $item->count);
+            $this->cost['var'] += $item->count * $item->semiproduct->cost['var'];
+            $this->cost['fix'] += $item->semiproduct->cost['fix'];
+        }
         
+        if ($this->isSemiproduct()) $this->cost['fix'] += $this->cost['var'] * $this->count;
         
+    }
+    
+    public function calculateCount($count){
+    
+        $this->calculate();
+        $this->cost['total'] = $this->cost['fix'] + $this->cost['var'] * $count;
+    
     }
 
     public function breadcrumbs(){
@@ -78,8 +102,8 @@ class Product extends CActiveRecord
         $breadcrumbs['Начало'] = array('product/index');
         return array_reverse($breadcrumbs);
     }
-
-	/**
+    
+    /**
 	 * @return array validation rules for model attributes.
 	 */
 	public function rules()
@@ -87,6 +111,7 @@ class Product extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
+            array('is_folder, name, parent_id', 'required'),
 			array('fix_cost', 'numerical', 'integerOnly'=>true),
 			array('parent_id, count', 'length', 'max'=>11),
 			array('is_folder, is_active, is_semiproduct', 'length', 'max'=>1),
@@ -106,7 +131,8 @@ class Product extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-            'processes' => array(self::MANY_MANY, 'ProductionProcess', 'price_product_calculation(product_id,calculation_id)'),
+            'processes' => array(self::HAS_MANY, 'ProductProductionProcess', array('product_id'=>'id')),
+            'semiproducts' => array(self::HAS_MANY, 'ProductSemiproduct', array('product_id'=>'id')),
             'parent' => array(self::HAS_ONE, 'Product', array('id'=>'parent_id')),
 		);
 	}
@@ -127,8 +153,9 @@ class Product extends CActiveRecord
 			'price' => 'Плановая цена',
 			'profit' => 'Плановая наценка',
 			'fix_cost' => 'Fix Cost',
-			'fcost' => 'Цена техпроцессов',
-			'vcost' => 'Цена штуки',
+			'cost.fix' => 'Цена техпроцессов',
+			'cost.var' => 'Цена штуки',
+            'cost.total' => 'Текущая себест-ть',
 		);
 	}
 

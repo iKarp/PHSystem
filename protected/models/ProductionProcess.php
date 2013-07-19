@@ -50,6 +50,11 @@ class ProductionProcess extends CActiveRecord
 		return 'price_data';
 	}
     
+    public function isGroup()
+	{
+		if ($this->is_folder == 1) return true; else false;
+	}
+    
     public function calculate(){
         
         $this->cost = array(
@@ -77,7 +82,13 @@ class ProductionProcess extends CActiveRecord
         $this->cost['taxSalary'] = $this->cost['operations'] * Yii::app()->params['taxSalary'] / 100;
         $this->cost['var'] = $this->cost['operations'] + $this->cost['taxSalary'] + $this->cost['materials'] + $this->cost['overhead'];
         
-        
+    }
+    
+    public function calculateCount($count){
+    
+        $this->calculate();
+        $this->cost['total'] = $this->cost['fix'] + $this->cost['var'] * $count;
+    
     }
     
     public function getPath(){
@@ -113,7 +124,7 @@ class ProductionProcess extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('is_folder, name, price, parent_id', 'required'),
+			array('is_folder, name, parent_id', 'required'),
 			array('is_folder, parent_id, is_active, comment_enabled', 'numerical', 'integerOnly'=>true),
 			array('amortization, accruals_zp, oncost, tax, balance, purchase, efficiency', 'numerical'),
 			array('name', 'length', 'max'=>255),
@@ -137,6 +148,7 @@ class ProductionProcess extends CActiveRecord
             'materials' => array(self::HAS_MANY, 'ProductionProcessMaterial', array('price_id'=>'id')),
             'operations' => array(self::HAS_MANY, 'ProductionProcessOperation', array('price_id'=>'id')),
             'subprocesses' => array(self::HAS_MANY, 'ProductionProcessSubprocess', array('parent_price_id'=>'id')),
+            'parent' => array(self::HAS_ONE, 'ProductionProcess', array('id'=>'parent_id')),
 		);
 	}
 
@@ -148,9 +160,9 @@ class ProductionProcess extends CActiveRecord
 		return array(
 			'id' => 'ID',
 			'is_folder' => 'Is Folder',
-			'name' => 'Технологический процесс',
+			'name' => 'Название',
 			'price' => 'Price',
-			'parent_id' => 'Parent',
+			'parent_id' => 'Группа',
 			'is_active' => 'Is Active',
 			'indx' => 'Indx',
 			'code' => 'Code',

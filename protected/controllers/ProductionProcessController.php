@@ -55,7 +55,7 @@ class ProductionProcessController extends Controller
           $limit = min($_GET['limit'], 50); 
           $criteria = new CDbCriteria;
           $criteria->condition = "name LIKE :sterm";
-          if (isset($_GET['onlyItems'])) $criteria->condition .= " AND is_folder='".$_GET['onlyItems']."'";
+          if (isset($_GET['is_folder'])) $criteria->condition .= " AND is_folder='".$_GET['is_folder']."'";
           $criteria->params = array(":sterm"=>"%$name%");
           $criteria->limit = $limit;
           $dataArray = ProductionProcess::model()->findAll($criteria);
@@ -98,16 +98,26 @@ class ProductionProcessController extends Controller
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
-		if(isset($_POST['ProductionProcess']))
-		{
+		if(isset($_POST['ProductionProcess'])){
 			$model->attributes=$_POST['ProductionProcess'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+            if($model->save()){
+				if(Yii::app()->request->isAjaxRequest){
+					echo 'success';
+					Yii::app()->end();
+				}
+				else {
+					if ($model->isGroup()) $this->redirect(array('index','parent_id'=>$model->parent_id));
+                    else $this->redirect(array('view','id'=>$model->id));
+				}
+			}
 		}
-
-		$this->render('create',array(
-			'model'=>$model,
-		));
+		if(Yii::app()->request->isAjaxRequest){
+			if (isset($_GET['isFolder'])) $model->is_folder = $_GET['isFolder'];
+            if (isset($_GET['parent_id'])) $model->parent_id = $_GET['parent_id'];
+			$this->renderPartial('create',array('model'=>$model), false, true);
+        }
+		else
+			$this->render('create',array('model'=>$model));
 	}
 
 	/**
@@ -125,8 +135,10 @@ class ProductionProcessController extends Controller
 		if(isset($_POST['ProductionProcess']))
 		{
 			$model->attributes=$_POST['ProductionProcess'];
+            if (empty($_POST['parent_name'])) $model->parent_id = 0;
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+				if ($model->isGroup()) $this->redirect(array('index','parent_id'=>$model->parent_id));
+                else $this->redirect(array('view','id'=>$model->id));
 		}
 
 		$this->render('update',array(
@@ -141,18 +153,14 @@ class ProductionProcessController extends Controller
 	 */
 	public function actionDelete($id)
 	{
-		if(Yii::app()->request->isPostRequest)
-		{
-			// we only allow deletion via POST request
-			$this->loadModel($id)->delete();
+		
+        $this->loadModel($id)->delete();
 
-			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-			if(!isset($_GET['ajax']))
-				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-		}
-		else
-			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
-	}
+		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+		if(!isset($_GET['ajax']))
+			$this->redirect(isset($_REQUEST['returnUrl']) ? $_REQUEST['returnUrl'] : array('admin'));
+    
+    }
 
 	/**
 	 * Lists all models.
@@ -179,6 +187,7 @@ class ProductionProcessController extends Controller
             $this->render('index',array(
                 'dataProvider'=>$dataProvider,
                 'breadcrumbs'=>$breadcrumbs,
+                'parent_id'=>$id,
             ));
         }
         else {

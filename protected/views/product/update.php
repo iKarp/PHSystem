@@ -19,6 +19,4 @@ $this->menu=array(
         else echo 'продукта';
     ?></h4>
 
-<br />
-
 <?php echo $this->renderPartial('_form',array('model'=>$model)); ?>

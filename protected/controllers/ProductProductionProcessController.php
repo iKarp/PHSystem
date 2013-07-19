@@ -63,6 +63,11 @@ class ProductProductionProcessController extends Controller
 	public function actionCreate()
 	{
 		$model=new ProductProductionProcess;
+        
+        if (isset($_GET['product_id'])) {
+            $model->product_id = $_GET['product_id'];
+            $model->product = Product::model()->findByPk($_GET['product_id']);
+        }
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);

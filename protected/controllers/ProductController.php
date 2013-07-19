@@ -74,8 +74,10 @@ class ProductController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$this->render('view',array(
-			'model'=>$this->loadModel($id),
+		$model = $this->loadModel($id);
+        if ($model->isProduct()) $model->calculateCount($model->count); else $model->calculate();
+        $this->render('view',array(
+			'model'=>$model,
 		));
 	}
 
@@ -127,8 +129,9 @@ class ProductController extends Controller
 		if(isset($_POST['Product']))
 		{
 			$model->attributes=$_POST['Product'];
+            if (empty($_POST['parent_name'])) $model->parent_id = 0;
 			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+				$this->redirect(isset($_REQUEST['returnUrl']) ? $_REQUEST['returnUrl'] : array('view','id'=>$model->id));
 		}
 
         foreach ($model->processes as $process)
@@ -146,17 +149,11 @@ class ProductController extends Controller
 	 */
 	public function actionDelete($id)
 	{
-		if(Yii::app()->request->isPostRequest)
-		{
-			// we only allow deletion via POST request
-			$this->loadModel($id)->delete();
+		$this->loadModel($id)->delete();
 
-			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-			if(!isset($_GET['ajax']))
-				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
-		}
-		else
-			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
+		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+		if(!isset($_GET['ajax']))
+			$this->redirect(isset($_REQUEST['returnUrl']) ? $_REQUEST['returnUrl'] : array('admin'));
 	}
 
 	/**

@@ -1,13 +1,5 @@
-<?php
-$this->breadcrumbs=array(
-	'Production Processes',
-);
-
-$this->menu=array(
-	array('label'=>'Create ProductionProcess','url'=>array('create')),
-	array('label'=>'Manage ProductionProcess','url'=>array('admin')),
-);
-?>
+<?php $this->beginWidget('bootstrap.widgets.TbModal', array('id'=>'TBDialogCrud')); ?>
+<?php $this->endWidget(); ?>
 
 <h3>Справочник технологических процессов</h3>
 <div><?php echo $path; ?></div>
@@ -42,16 +34,49 @@ $this->menu=array(
                 'name'=>'name',
                 'header'=>'Технологические процессы',
             ),
-            /*array(
+            array(
                 'class'=>'bootstrap.widgets.TbButtonColumn',
-                'template'=>'{view}',
+                'template'=>'{update}',
                 'buttons'=>array(
-                    'view' => array(
-                        'url'=>'Yii::app()->createUrl("productionProcess/view", array("parent_id"=>$data->id))',  
+                    'update' => array(
+                        //'url'=>'Yii::app()->createUrl("productionProcess/view", array("parent_id"=>$data->id))',
                     ),
                 ),
 
-            )*/
+            )
+        ),
+    ));
+?>
+
+<?php
+    $this->widget('bootstrap.widgets.TbButtonGroup', array(
+        'buttons'=>array(
+            array(
+                'label'=>'Добавить',
+                'icon'=>'plus',
+                'items'=>array(
+                    array(
+                        'label'=>'Процесс',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("productionProcess/create", array("parent_id"=>$parent_id,"isFolder"=>'0')),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                    array(
+                        'label'=>'Группу',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("productionProcess/create", array("parent_id"=>$parent_id,"isFolder"=>'1')),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                ),
+            ),
         ),
     ));
 ?>
