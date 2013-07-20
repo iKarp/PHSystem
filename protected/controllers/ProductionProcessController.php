@@ -171,7 +171,7 @@ class ProductionProcessController extends Controller
         
         if ($id != 0) $model = $this->loadModel($id);
         
-        if ($model->is_folder || $id == 0) {
+        if ($id == 0 || $model->is_folder) {
             $dataProvider=new CActiveDataProvider('ProductionProcess', array(
                 'criteria'=>array(
                     'condition'=>'parent_id = '.$id,

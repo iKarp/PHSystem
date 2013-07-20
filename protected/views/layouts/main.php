@@ -59,10 +59,6 @@
                     array('label'=>'Продукты', 'url'=>'?r=product/index'),
                     array('label'=>'Материалы', 'url'=>'?r=material/index'),
                 )),
-                array('label'=>'Финансы', 'url'=>'#', 'items'=>array(
-                    array('label'=>'Проводки', 'url'=>'?r=finOrder/index'),
-                    array('label'=>'Бюджет', 'url'=>'?r=order/index&status_id=1'),
-                )),
             ),
         ),
     ),
