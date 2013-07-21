@@ -34,6 +34,12 @@ class Material extends CActiveRecord
 		return 'production_materials';
 	}
 
+    public function isGroup()
+	{
+		if ($this->is_folder == 1) return true; else return false;
+	}
+    
+
 	/**
 	 * @return array validation rules for model attributes.
 	 */
@@ -63,6 +69,7 @@ class Material extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
             'measurement' => array(self::HAS_ONE, 'DataList', array('code'=>'measurement_id'), 'on'=>"`type`='measurement'"),
+            'parent' => array(self::HAS_ONE, 'Material', array('id'=>'parent_id')),
 		);
 	}
 
@@ -87,7 +94,7 @@ class Material extends CActiveRecord
     public function breadcrumbs(){
         $breadcrumbs = array();
         $parent_id = $this->parent_id;
-        $breadcrumbs[$this->name] = array('material/index&parent_id='.$parent_id);
+        $breadcrumbs[$this->name] = array('material/index&parent_id='.$this->id);
         while ($parent_id > 0) {
             $model = Material::model()->findByPk($parent_id);
             $breadcrumbs[$model->name] = array('material/index&parent_id='.$parent_id);

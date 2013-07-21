@@ -1,19 +1,8 @@
-<?php
-$this->breadcrumbs=array(
-	'Materials',
-);
-
-$this->menu=array(
-	array('label'=>'Create Material','url'=>array('create')),
-	array('label'=>'Manage Material','url'=>array('admin')),
-);
-?>
 
 <?php $this->beginWidget('bootstrap.widgets.TbModal', array('id'=>'TBDialogCrud')); ?>
 <?php $this->endWidget(); ?>
 
 <h3>Справочник материалов</h3>
-<div><?php echo $path; ?></div>
 <?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
     'homeLink'=>'',
     'links'=>$breadcrumbs,
@@ -29,11 +18,7 @@ $this->menu=array(
         'selectableRows'=>1,
         'selectionChanged'=>'
             function(id){
-                var url = "'.Yii::app()->createUrl('material/update').'&id="+$.fn.yiiGridView.getSelection(id);
-                $.get(url, function(r){
-                    $("#TBDialogCrud").html(r.id).modal("show");
-                });
-                return false;
+                location.href = "'.Yii::app()->createUrl('material/index').'&parent_id="+$.fn.yiiGridView.getSelection(id);
             }
         ',
         //'filter'=>$order->search(),
@@ -50,8 +35,17 @@ $this->menu=array(
                 'header'=>'Материалы',
             ),
             array(
+                'name'=>'price',
+                'header'=>'Цена, руб',
+                'value'=>'($data->is_folder) ? "" : $data->price',
+            ),
+            array(
+                'name'=>'measurement.name',
+                'header'=>'Ед. изм.',
+            ),
+            array(
                 'class'=>'bootstrap.widgets.TbButtonColumn',
-                'template'=>'{update}{delete}',
+                'template'=>'{update}',
                 'buttons' => array(
                     'update' => array(
                         'click'=>'function(){
@@ -77,15 +71,24 @@ $this->menu=array(
                 'items'=>array(
                     array(
                         'label'=>'Материал',
-                        'url'=>Yii::app()->createUrl("material/create", array("parent_id"=>$model->parent_id)),
+                        'url'=>'#',
                         'linkOptions'=>array(
                             'ajax' => array(
-                                'url'=>$this->createUrl('create'),
+                                'url'=>Yii::app()->createUrl("material/create", array("parent_id"=>$parent_id,"is_folder"=>0)),
                                 'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
                             ),
                         ),
                     ),
-                    array('label'=>'Группу', 'url'=>Yii::app()->createUrl("material/create", array("parent_id"=>$model->parent_id))),
+                    array(
+                        'label'=>'Группу',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("material/create", array("parent_id"=>$parent_id,'is_folder'=>1)),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
                 ),
             ),
         ),

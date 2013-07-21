@@ -55,7 +55,7 @@ class MaterialController extends Controller
           $limit = min($_GET['limit'], 50); 
           $criteria = new CDbCriteria;
           $criteria->condition = "name LIKE :sterm";
-          if (isset($_GET['onlyItems'])) $criteria->condition .= " AND is_folder='".$_GET['onlyItems']."'";
+          if (isset($_GET['is_folder'])) $criteria->condition .= " AND is_folder='".$_GET['is_folder']."'";
           $criteria->params = array(":sterm"=>"%$name%");
           $criteria->limit = $limit;
           $dataArray = Material::model()->findAll($criteria);
@@ -104,8 +104,14 @@ class MaterialController extends Controller
 				}
 			}
 		}
-		if(Yii::app()->request->isAjaxRequest)
+		if(Yii::app()->request->isAjaxRequest){
+            if (isset($_GET['is_folder'])) $model->is_folder = $_GET['is_folder'];
+            if (isset($_GET['parent_id'])) {
+                $model->parent_id = $_GET['parent_id'];
+                $model->parent = Material::model()->findByPk($model->parent_id);
+            }            
 			$this->renderPartial('_form',array('model'=>$model), false, true);
+        }
 		else
 			$this->render('create',array('model'=>$model));
 	}
@@ -125,6 +131,7 @@ class MaterialController extends Controller
 		if(isset($_POST['Material']))
 		{
 			$model->attributes=$_POST['Material'];
+            if (empty($_POST['parent_name'])) $model->parent_id = 0;
 			if($model->save()) {
 				if(Yii::app()->request->isAjaxRequest){
 					echo 'success';
@@ -154,9 +161,12 @@ class MaterialController extends Controller
 			// we only allow deletion via POST request
 			$this->loadModel($id)->delete();
 
-			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-			if(!isset($_GET['ajax']))
-				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+			echo 'success';
+            Yii::app()->end();
+            
+            // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+			//if(!isset($_GET['ajax']))
+			//	$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
 		}
 		else
 			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');
@@ -167,8 +177,38 @@ class MaterialController extends Controller
 	 */
 	public function actionIndex()
 	{
-		parent::groupView($this, 'Material', $_GET['parentID']);
-	}
+        $id = isset($_GET['parent_id']) ? $_GET['parent_id'] : 0;
+        
+        $showList = true;
+        $breadcrumbs = '';
+        
+        if ($id != 0) {
+            if ($model = $this->loadModel($id)){
+                $breadcrumbs = $model->breadcrumbs();
+                if (!$model->isGroup()) $showList = false;
+            }
+        }
+        
+        if ($showList) {
+            $dataProvider=new CActiveDataProvider('Material', array(
+                'criteria'=>array(
+                    'condition'=>'parent_id = '.$id,
+                    'order'=>'is_folder DESC, name',
+                ),
+                'pagination'=>array(
+                    'pageSize'=>20,
+                ),
+            ));
+            $this->render('index',array(
+                'dataProvider'=>$dataProvider,
+                'breadcrumbs'=>$breadcrumbs,
+                'parent_id'=>$id,
+            ));
+        }
+        else {
+            $this->redirect(array('view','id'=>$id));
+        }
+    }
 
 	/**
 	 * Manages all models.

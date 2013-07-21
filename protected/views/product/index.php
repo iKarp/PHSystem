@@ -3,7 +3,6 @@
 
 
 <h3>Справочник продуктов</h3>
-<div><?php echo $path; ?></div>
 <?php $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
     'homeLink'=>'',
     'links'=>$breadcrumbs,

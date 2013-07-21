@@ -40,7 +40,7 @@ class Product extends CActiveRecord
     
     public function isGroup()
 	{
-		if ($this->is_folder == 1) return true; else false;
+		if ($this->is_folder == 1) return true; else return false;
 	}
     
     public function isProduct()
@@ -93,7 +93,7 @@ class Product extends CActiveRecord
     public function breadcrumbs(){
         $breadcrumbs = array();
         $parent_id = $this->parent_id;
-        $breadcrumbs[$this->name] = array('product/index&parent_id='.$parent_id);
+        $breadcrumbs[$this->name] = array('product/index&parent_id='.$this->id);
         while ($parent_id > 0) {
             $model = Product::model()->findByPk($parent_id);
             $breadcrumbs[$model->name] = array('product/index&parent_id='.$parent_id);

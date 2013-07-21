@@ -50,9 +50,10 @@ class ProductionOperationController extends Controller
 	 */
 	public function actionView($id)
 	{
-		$this->render('view',array(
-			'model'=>$this->loadModel($id),
-		));
+		if(Yii::app()->request->isAjaxRequest)
+			$this->renderPartial('view',array('model'=>$this->loadModel($id)));
+		else
+			$this->render('view',array('model'=>$this->loadModel($id)));
 	}
 
 	/**
@@ -65,17 +66,23 @@ class ProductionOperationController extends Controller
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
-
-		if(isset($_POST['ProductionOperation']))
-		{
+		
+		if(isset($_POST['ProductionOperation'])){
 			$model->attributes=$_POST['ProductionOperation'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			if($model->save()){
+				if(Yii::app()->request->isAjaxRequest){
+					echo 'success';
+					Yii::app()->end();
+				}
+				else {
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}
 		}
-
-		$this->render('create',array(
-			'model'=>$model,
-		));
+		if(Yii::app()->request->isAjaxRequest)
+			$this->renderPartial('_form',array('model'=>$model), false, true);
+		else
+			$this->render('create',array('model'=>$model));
 	}
 
 	/**
@@ -93,13 +100,21 @@ class ProductionOperationController extends Controller
 		if(isset($_POST['ProductionOperation']))
 		{
 			$model->attributes=$_POST['ProductionOperation'];
-			if($model->save())
-				$this->redirect(array('view','id'=>$model->id));
+			if($model->save()) {
+				if(Yii::app()->request->isAjaxRequest){
+					echo 'success';
+					Yii::app()->end();
+				}
+				else {
+					$this->redirect(array('view','id'=>$model->id));
+				}
+			}
 		}
-
-		$this->render('update',array(
-			'model'=>$model,
-		));
+		if(Yii::app()->request->isAjaxRequest)
+			$this->renderPartial('_form',array('model'=>$model), false, true);
+        
+		else
+			$this->render('update',array('model'=>$model));
 	}
 
 	/**
@@ -127,10 +142,37 @@ class ProductionOperationController extends Controller
 	 */
 	public function actionIndex()
 	{
-		$dataProvider=new CActiveDataProvider('ProductionOperation');
-		$this->render('index',array(
-			'dataProvider'=>$dataProvider,
-		));
+		$id = isset($_GET['parent_id']) ? $_GET['parent_id'] : 0;
+        
+        $showList = true;
+        $breadcrumbs = '';
+        
+        if ($id != 0) {
+            if ($model = $this->loadModel($id)){
+                $breadcrumbs = $model->breadcrumbs();
+                if (!$model->isGroup()) $showList = false;
+            }
+        }
+        
+        if ($showList) {
+            $dataProvider=new CActiveDataProvider('ProductionOperation', array(
+                'criteria'=>array(
+                    'condition'=>'parent_id = '.$id,
+                    'order'=>'is_folder DESC, name',
+                ),
+                'pagination'=>array(
+                    'pageSize'=>20,
+                ),
+            ));
+            $this->render('index',array(
+                'dataProvider'=>$dataProvider,
+                'breadcrumbs'=>$breadcrumbs,
+                'parent_id'=>$id,
+            ));
+        }
+        else {
+            $this->redirect(array('view','id'=>$id));
+        }
 	}
 
 	/**

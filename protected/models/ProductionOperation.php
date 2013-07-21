@@ -33,6 +33,12 @@ class ProductionOperation extends CActiveRecord
 	{
 		return 'production_works_hours';
 	}
+    
+    public function isGroup()
+	{
+		if ($this->is_folder == 1) return true; else return false;
+	}
+    
 
 	/**
 	 * @return array validation rules for model attributes.
@@ -63,6 +69,7 @@ class ProductionOperation extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
             'measurement' => array(self::HAS_ONE, 'ProductionOperationMeasurement', array('id'=>'measurement_id')),
+            'parent' => array(self::HAS_ONE, 'ProductionOperation', array('id'=>'parent_id')),
 		);
 	}
 
@@ -83,6 +90,19 @@ class ProductionOperation extends CActiveRecord
 			'measurement_id' => 'Measurement',
 		);
 	}
+
+	public function breadcrumbs(){
+        $breadcrumbs = array();
+        $parent_id = $this->parent_id;
+        $breadcrumbs[$this->name] = array('productionOperation/index&parent_id='.$this->id);
+        while ($parent_id > 0) {
+            $model = ProductionOperation::model()->findByPk($parent_id);
+            $breadcrumbs[$model->name] = array('productionOperation/index&parent_id='.$parent_id);
+            $parent_id = $model->parent_id;
+        }
+        $breadcrumbs['Начало'] = array('productionOperation/index');
+        return array_reverse($breadcrumbs);
+    }
 
 	/**
 	 * Retrieves a list of models based on the current search/filter conditions.

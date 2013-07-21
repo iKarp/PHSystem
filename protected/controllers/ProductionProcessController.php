@@ -169,9 +169,17 @@ class ProductionProcessController extends Controller
 	{
 		$id = isset($_GET['parent_id']) ? $_GET['parent_id'] : 0;
         
-        if ($id != 0) $model = $this->loadModel($id);
+        $showList = true;
+        $breadcrumbs = '';
         
-        if ($id == 0 || $model->is_folder) {
+        if ($id != 0) {
+            if ($model = $this->loadModel($id)){
+                $breadcrumbs = $model->breadcrumbs();
+                if (!$model->isGroup()) $showList = false;
+            }
+        }
+        
+        if ($showList) {
             $dataProvider=new CActiveDataProvider('ProductionProcess', array(
                 'criteria'=>array(
                     'condition'=>'parent_id = '.$id,
@@ -181,9 +189,6 @@ class ProductionProcessController extends Controller
                     'pageSize'=>20,
                 ),
             ));
-            if ($model) {
-                $breadcrumbs = $model->breadcrumbs();
-            }
             $this->render('index',array(
                 'dataProvider'=>$dataProvider,
                 'breadcrumbs'=>$breadcrumbs,

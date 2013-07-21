@@ -21,35 +21,5 @@ class Controller extends CController
 	 */
 	public $breadcrumbs=array();
     
-    public function groupView(&$contr, $modelName, $parentID)
-	{
-    
-        $id = isset($parentID) ? $parentID : 0;
-		
-        if ($id != 0) $model = $contr->loadModel($id);
-        
-        if ($model->is_folder || $id == 0) {
-            $dataProvider=new CActiveDataProvider($modelName, array(
-                'criteria'=>array(
-                    'condition'=>'parent_id = '.$id,
-                    'order'=>'is_folder DESC, name',
-                ),
-                'pagination'=>array(
-                    'pageSize'=>20,
-                ),
-            ));
-            if ($model) {
-                $breadcrumbs = $model->breadcrumbs();
-            }
-            //else
-            $contr->render('index',array(
-                'dataProvider'=>$dataProvider,
-                'breadcrumbs'=>$breadcrumbs,
-            ));
-        }
-        else {
-            $contr->redirect(array('view','id'=>$id));
-        }        
-	}
     
 }

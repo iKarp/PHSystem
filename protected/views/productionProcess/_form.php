@@ -24,7 +24,7 @@
                     'delay'=>500, //number of milliseconds before lookup occurs
                     'matchCase'=>false, //match case when performing a lookup?
                     'htmlOptions'=>array('class'=>'span5', 'placeholder'=>'Выберите из списка', ),
-                    'value'=>$model->parent->name,
+                    'value'=>(isset($model->parent->name)) ? $model->parent->name : '',
                     'methodChain'=>".result(function(event,item){\$(\"#ProductionProcess_parent_id\").val(item[1]);})",
                 )); ?>
                 <?php echo $form->hiddenField($model,'parent_id'); ?>
@@ -101,7 +101,7 @@
         'buttonType'=>'ajaxButton',
         'label'=>'Добавить',
         'icon'=>'plus',
-        'url'=>Yii::app()->createUrl("productionProcessOperation/create", array("id"=>$data->id)),
+        'url'=>Yii::app()->createUrl("productionProcessOperation/create", array("ProductionProcessID"=>$model->id)),
         'ajaxOptions' => array(
 			'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
 		),
@@ -147,7 +147,7 @@
         'buttonType'=>'ajaxButton',
         'label'=>'Добавить',
         'icon'=>'plus',
-        'url'=>Yii::app()->createUrl("productionProcessSubprocess/create", array("id"=>$data->id)),
+        'url'=>Yii::app()->createUrl("productionProcessSubprocess/create", array("ProductionProcessID"=>$model->id)),
         'ajaxOptions' => array(
 			'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
 		),

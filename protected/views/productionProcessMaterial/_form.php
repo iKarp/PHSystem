@@ -25,7 +25,7 @@
             <div class="controls">
                 <?php $this->widget('CAutoComplete', array(
                     'name'=>'material_name',
-                    'url'=>$this->createUrl('material/autoCompleteLookup'),
+                    'url'=>$this->createUrl('material/autoCompleteLookup',array('is_folder'=>0)),
                     'max'=>9, //specifies the max number of items to display
                     'minChars'=>3,
                     'delay'=>500, //number of milliseconds before lookup occurs

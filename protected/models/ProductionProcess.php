@@ -27,12 +27,7 @@ class ProductionProcess extends CActiveRecord
 
     public $cost = array();
 
-    public function onAfterFind(){
-        Yii::trace("Its PROCESS afterConstruct", 'dev.order.construct');
-        $this->fullName = $this->name."+Full";
-    }
-
-	/**
+    /**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
 	 * @return Process the static model class
@@ -52,7 +47,7 @@ class ProductionProcess extends CActiveRecord
     
     public function isGroup()
 	{
-		if ($this->is_folder == 1) return true; else false;
+		if ($this->is_folder == 1) return true; else return false;
 	}
     
     public function calculate(){
@@ -106,7 +101,7 @@ class ProductionProcess extends CActiveRecord
     public function breadcrumbs(){
         $breadcrumbs = array();
         $parent_id = $this->parent_id;
-        $breadcrumbs[$this->name] = array('productionProcess/index&parent_id='.$parent_id);
+        $breadcrumbs[$this->name] = array('productionProcess/index&parent_id='.$this->id);
         while ($parent_id > 0) {
             $model = ProductionProcess::model()->findByPk($parent_id);
             $breadcrumbs[$model->name] = array('productionProcess/index&parent_id='.$parent_id);

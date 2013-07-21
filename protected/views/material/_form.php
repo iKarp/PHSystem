@@ -1,7 +1,10 @@
 <?php if (Yii::app()->request->isAjaxRequest): ?>
 <div class="modal-header">
 	<a class="close" data-dismiss="modal">&times;</a>
-	<h4><?php echo $model->isNewRecord ? 'Create Material' : 'Изменение материала' ?></h4>
+	<h4><?php
+        if ($model->isGroup()) echo $model->isNewRecord ? 'Создание группы' : 'Изменение группы';
+        else echo $model->isNewRecord ? 'Создание материала' : 'Изменение материала';
+    ?></h4>
 </div>
 
 <div class="modal-body">
@@ -19,14 +22,15 @@
         <?php echo $form->label($model, 'parent_id', array('class'=>'control-label')); ?>
         <div class="controls">
                 <?php $this->widget('CAutoComplete', array(
-                    'name'=>'material_name',
-                    'url'=>$this->createUrl('material/autoCompleteLookup',array('onlyItems'=>'1')),
+                    'name'=>'parent_name',
+                    'url'=>$this->createUrl('material/autoCompleteLookup',array('is_folder'=>'1')),
                     'max'=>9, //specifies the max number of items to display
                     'minChars'=>3,
                     'delay'=>500, //number of milliseconds before lookup occurs
                     'matchCase'=>false, //match case when performing a lookup?
                     'htmlOptions'=>array('class'=>'span5','placeholder'=>'Выберите из списка'),
-                    'methodChain'=>".result(function(event,item){\$(\"#ProductionProcessMaterial_material_id\").val(item[1]);})",
+                    'value'=>(isset($model->parent->name)) ? $model->parent->name : '',
+                    'methodChain'=>".result(function(event,item){\$(\"#Material_parent_id\").val(item[1]);})",
                 )); ?>
             <?php echo $form->hiddenField($model,'parent_id'); ?>
         </div>
@@ -34,11 +38,19 @@
 
 	<?php echo $form->hiddenField($model,'is_folder',array('class'=>'span5')); ?>
 
-	<?php echo $form->textFieldRow($model,'name',array('class'=>'span5','maxlength'=>50)); ?>
+	<?php echo $form->textFieldRow($model,'name',array(
+        'class'=>'span5',
+        'maxlength'=>50,
+        'labelOptions'=>($model->isGroup()) ? array('label' => 'Название') : '',
+    )); ?>
 
-    <?php echo $form->dropDownListRow($model, 'measurement_id', DataList::items('measurement'), array('class'=>'span5')); ?>
+    <?php if (!$model->isGroup()): ?>
 
-	<?php echo $form->textFieldRow($model,'price',array('class'=>'span5','maxlength'=>10)); ?>
+        <?php echo $form->dropDownListRow($model, 'measurement_id', DataList::items('measurement'), array('class'=>'span5')); ?>
+
+        <?php echo $form->textFieldRow($model,'price',array('class'=>'span5','maxlength'=>10)); ?>
+
+    <?php endif; ?>
 
 	<?php if (!Yii::app()->request->isAjaxRequest): ?>
 	<div class="form-actions">
@@ -66,6 +78,27 @@
 				'url'=>$model->isNewRecord ? $this->createUrl('create') : $this->createUrl('update', array('id'=>$model->id)),
 				'type'=>'post',
 				'data'=>'js:$(this).parent().parent().find("form").serialize()',
+				'success'=>'function(r){
+					if(r=="success"){
+						window.location.reload();
+					}
+					else{
+						$("#TBDialogCrud").html(r).modal("show");
+					}
+				}', 
+			),
+		),
+    )); ?>
+    <?php if (!$model->isNewRecord) $this->widget('bootstrap.widgets.TbButton', array(
+        'type'=>'danger',
+        'label'=>'Удалить',
+        'url'=>'#',
+		'htmlOptions'=>array(
+			'id'=>'delete-'.mt_rand(),
+			'ajax' => array(
+				'url'=>$this->createUrl('delete', array('id'=>$model->id)),
+				'type'=>'post',
+				//'data'=>'js:$(this).parent().parent().find("form").serialize()',
 				'success'=>'function(r){
 					if(r=="success"){
 						window.location.reload();

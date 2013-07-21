@@ -24,7 +24,7 @@
                     'delay'=>500, //number of milliseconds before lookup occurs
                     'matchCase'=>false, //match case when performing a lookup?
                     'htmlOptions'=>array('class'=>'span5', 'placeholder'=>'Выберите из списка', ),
-                    'value'=>$model->parent->name,
+                    'value'=>(isset($model->parent->name)) ? $model->parent->name : '',
                     'methodChain'=>".result(function(event,item){\$(\"#Product_parent_id\").val(item[1]);})",
                 )); ?>
                 <?php echo $form->hiddenField($model,'parent_id'); ?>
@@ -183,6 +183,7 @@
                 'id'=>$model->id,
                 'returnUrl'=>Yii::app()->createUrl("product/index", array("parent_id"=>$model->parent_id)),
             )),
+            //'confirm'=>'Are you sure you want to delete this item?',
             //'htmlOptions'=>array('class'=>'span2'),
 		)); ?>
         <?php $this->widget('bootstrap.widgets.TbButton', array(

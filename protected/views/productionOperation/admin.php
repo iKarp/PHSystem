@@ -6,7 +6,12 @@ $this->breadcrumbs=array(
 
 $this->menu=array(
 	array('label'=>'List ProductionOperation','url'=>array('index')),
-	array('label'=>'Create ProductionOperation','url'=>array('create')),
+	array('label'=>'Create ProductionOperation', 'url'=>array('create'), 'linkOptions'=>array(
+		'ajax' => array(
+			'url'=>$this->createUrl('create'),
+			'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+		),
+	)),
 );
 
 Yii::app()->clientScript->registerScript('search', "
@@ -22,6 +27,9 @@ $('.search-form form').submit(function(){
 });
 ");
 ?>
+
+<?php $this->beginWidget('bootstrap.widgets.TbModal', array('id'=>'TBDialogCrud')); ?>
+<?php $this->endWidget(); ?>
 
 <h1>Manage Production Operations</h1>
 
@@ -39,6 +47,7 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 
 <?php $this->widget('bootstrap.widgets.TbGridView',array(
 	'id'=>'production-operation-grid',
+	'ajaxUpdate'=>false,
 	'dataProvider'=>$model->search(),
 	'filter'=>$model,
 	'columns'=>array(
@@ -55,6 +64,26 @@ or <b>=</b>) at the beginning of each of your search values to specify how the c
 		*/
 		array(
 			'class'=>'bootstrap.widgets.TbButtonColumn',
+			'buttons' => array(
+				'update' => array(
+					'click'=>'function(){
+						var url = $(this).attr("href");
+						$.get(url, function(r){
+							$("#TBDialogCrud").html(r).modal("show");
+						});
+						return false;
+					}',
+				),
+				'view' => array(
+					'click'=>'function(){
+						var url = $(this).attr("href");
+						$.get(url, function(r){
+							$("#TBDialogCrud").html(r).modal("show");
+						});
+						return false;
+					}',
+				),
+			),
 		),
 	),
 )); ?>

@@ -29,8 +29,8 @@ $this->menu=array(
         ),
 		'cost.fix',
 		'cost.var',
-        'cost.total',
 	);
+    if ($model->isProduct()) $fields[] = 'cost.total';
     $this->widget('bootstrap.widgets.TbDetailView',array(
         'data'=>$model,
         'attributes'=>$fields,
