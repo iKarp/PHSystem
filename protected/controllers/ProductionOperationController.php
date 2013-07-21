@@ -100,6 +100,7 @@ class ProductionOperationController extends Controller
 		if(isset($_POST['ProductionOperation']))
 		{
 			$model->attributes=$_POST['ProductionOperation'];
+            if (empty($_POST['parent_name'])) $model->parent_id = 0;
 			if($model->save()) {
 				if(Yii::app()->request->isAjaxRequest){
 					echo 'success';

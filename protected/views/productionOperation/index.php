@@ -33,15 +33,15 @@
                 'name'=>'name',
                 'header'=>'Операции',
             ),
-            /*array(
-                'name'=>'price',
-                'header'=>'Цена, руб',
-                'value'=>'($data->is_folder) ? "" : $data->price',
-            ),
             array(
                 'name'=>'measurement.name',
-                'header'=>'Ед. изм.',
-            ),*/
+                'header'=>'Персонал',
+                //'value'=>'($data->is_folder) ? "" : $data->price',
+            ),
+            array(
+                'name'=>'productivity',
+                'header'=>'Выработка в час, шт',
+            ),
             array(
                 'class'=>'bootstrap.widgets.TbButtonColumn',
                 'template'=>'{update}',

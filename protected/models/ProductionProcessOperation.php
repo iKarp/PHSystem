@@ -33,7 +33,7 @@ class ProductionProcessOperation extends CActiveRecord
 	}
 
     public function calculate(){
-        $this->cost = $this->work_count * $this->operation->measurement->cost * $this->operation->hours;
+        $this->cost = $this->work_count * $this->operation->measurement->cost / $this->operation->productivity;
     }
 
 	/**

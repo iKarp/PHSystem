@@ -48,7 +48,7 @@ class ProductionOperation extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('tag', 'required'),
+			array('productivity, parent_id, is_folder', 'required'),
 			array('parent_id, is_folder, is_active, measurement_id', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>50),
 			array('description', 'length', 'max'=>255),
@@ -80,14 +80,15 @@ class ProductionOperation extends CActiveRecord
 	{
 		return array(
 			'id' => 'ID',
-			'parent_id' => 'Parent',
+			'parent_id' => 'Группа',
 			'is_folder' => 'Is Folder',
 			'is_active' => 'Is Active',
-			'name' => 'Name',
+			'name' => 'Операция',
 			'description' => 'Description',
 			'tag' => 'Tag',
 			'hours' => 'Hours',
-			'measurement_id' => 'Measurement',
+			'measurement_id' => 'Персонал',
+            'productivity' => 'Выработка',
 		);
 	}
 

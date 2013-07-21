@@ -53,7 +53,7 @@ $this->menu=array(
             array('name'=>'operation.measurement.name', 'header'=>'Персонал'),
             array('name'=>'work_count', 'header'=>'Кол-во'),
             array('name'=>'operation.measurement.cost', 'header'=>'Стоимость н/ч'),
-            array('value'=>'sprintf("%.6f",1/$data->operation->hours)', 'header'=>'Выработка в час'),
+            array('value'=>'sprintf("%.3f",$data->operation->productivity)', 'header'=>'Выработка, шт'),
             array('value'=>'sprintf("%.6f",$data->cost)', 'header'=>'Сумма'),
         ),
     ));
