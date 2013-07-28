@@ -23,14 +23,14 @@
         <div class="controls">
                 <?php $this->widget('CAutoComplete', array(
                     'name'=>'parent_name',
-                    'url'=>$this->createUrl('pruductionOperation/autoCompleteLookup',array('is_folder'=>'1')),
+                    'url'=>$this->createUrl('productionOperation/autoCompleteLookup',array('is_folder'=>'1')),
                     'max'=>9, //specifies the max number of items to display
                     'minChars'=>3,
                     'delay'=>500, //number of milliseconds before lookup occurs
                     'matchCase'=>false, //match case when performing a lookup?
                     'htmlOptions'=>array('class'=>'span5','placeholder'=>'Выберите из списка'),
                     'value'=>(isset($model->parent->name)) ? $model->parent->name : '',
-                    'methodChain'=>".result(function(event,item){\$(\"#Material_parent_id\").val(item[1]);})",
+                    'methodChain'=>".result(function(event,item){\$(\"#ProductionOperation_parent_id\").val(item[1]);})",
                 )); ?>
             <?php echo $form->hiddenField($model,'parent_id'); ?>
         </div>
@@ -51,8 +51,8 @@
         <?php echo $form->label($model, 'measurement_id', array('class'=>'control-label')); ?>
         <div class="controls">
                 <?php $this->widget('CAutoComplete', array(
-                    'name'=>'parent_name',
-                    'url'=>$this->createUrl('pruductionOperation/autoCompleteLookup',array('is_folder'=>'1')),
+                    'name'=>'measurement_name',
+                    'url'=>$this->createUrl('productionOperationMeasurement/autoCompleteLookup'),
                     'max'=>9, //specifies the max number of items to display
                     'minChars'=>3,
                     'delay'=>500, //number of milliseconds before lookup occurs
@@ -94,6 +94,27 @@
 				'url'=>$model->isNewRecord ? $this->createUrl('create') : $this->createUrl('update', array('id'=>$model->id)),
 				'type'=>'post',
 				'data'=>'js:$(this).parent().parent().find("form").serialize()',
+				'success'=>'function(r){
+					if(r=="success"){
+						window.location.reload();
+					}
+					else{
+						$("#TBDialogCrud").html(r).modal("show");
+					}
+				}', 
+			),
+		),
+    )); ?>
+    <?php if (!$model->isNewRecord) $this->widget('bootstrap.widgets.TbButton', array(
+        'type'=>'danger',
+        'label'=>'Удалить',
+        'url'=>'#',
+		'htmlOptions'=>array(
+			'id'=>'delete-'.mt_rand(),
+			'ajax' => array(
+				'url'=>$this->createUrl('delete', array('id'=>$model->id)),
+				'type'=>'post',
+				//'data'=>'js:$(this).parent().parent().find("form").serialize()',
 				'success'=>'function(r){
 					if(r=="success"){
 						window.location.reload();

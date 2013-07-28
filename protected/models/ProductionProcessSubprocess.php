@@ -62,6 +62,7 @@ class ProductionProcessSubprocess extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
             'process' => array(self::HAS_ONE, 'ProductionProcess', array('id'=>'price_id')),
+            'parent' => array(self::BELONGS_TO, 'ProductionProcess', array('parent_price_id'=>'id')),
 		);
 	}
 
@@ -72,9 +73,9 @@ class ProductionProcessSubprocess extends CActiveRecord
 	{
 		return array(
 			'relation_id' => 'Relation',
-			'parent_price_id' => 'Parent Price',
-			'price_id' => 'Price',
-			'price_count' => 'Price Count',
+			'parent_price_id' => 'Технологичекий',
+			'price_id' => 'Сопутствующий технологический процесс',
+			'price_count' => 'Количество',
 		);
 	}
 

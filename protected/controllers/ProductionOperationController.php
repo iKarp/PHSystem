@@ -31,7 +31,7 @@ class ProductionOperationController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update'),
+				'actions'=>array('create','update','autoCompleteLookup'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -43,6 +43,32 @@ class ProductionOperationController extends Controller
 			),
 		);
 	}
+
+    public function actionAutoCompleteLookup()
+	{
+        if(Yii::app()->request->isAjaxRequest && isset($_GET['q'])){
+            /* q is the default GET variable name that is used by
+            / the autocomplete widget to pass in user input
+            */
+          $name = $_GET['q']; 
+                    // this was set with the "max" attribute of the CAutoComplete widget
+          $limit = min($_GET['limit'], 50); 
+          $criteria = new CDbCriteria;
+          $criteria->condition = "name LIKE :sterm";
+          if (isset($_GET['is_folder'])) $criteria->condition .= " AND is_folder='".$_GET['is_folder']."'";
+          $criteria->params = array(":sterm"=>"%$name%");
+          $criteria->limit = $limit;
+          $dataArray = ProductionOperation::model()->findAll($criteria);
+          $returnVal = '';
+          foreach($dataArray as $data)
+          {
+             $returnVal .= $data->getAttribute('name').'|'.$data->getAttribute('id')."\n";
+          }
+          echo $returnVal;
+       }
+    }
+
+
 
 	/**
 	 * Displays a particular model.
@@ -79,8 +105,14 @@ class ProductionOperationController extends Controller
 				}
 			}
 		}
-		if(Yii::app()->request->isAjaxRequest)
+		if(Yii::app()->request->isAjaxRequest){
+            if (isset($_GET['is_folder'])) $model->is_folder = $_GET['is_folder'];
+            if (isset($_GET['parent_id'])) {
+                $model->parent_id = $_GET['parent_id'];
+                $model->parent = ProductionOperation::model()->findByPk($model->parent_id);
+            }            
 			$this->renderPartial('_form',array('model'=>$model), false, true);
+        }
 		else
 			$this->render('create',array('model'=>$model));
 	}
@@ -130,9 +162,12 @@ class ProductionOperationController extends Controller
 			// we only allow deletion via POST request
 			$this->loadModel($id)->delete();
 
-			// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
-			if(!isset($_GET['ajax']))
-				$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
+			echo 'success';
+            Yii::app()->end();
+            
+            // if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+			//if(!isset($_GET['ajax']))
+			//	$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('admin'));
 		}
 		else
 			throw new CHttpException(400,'Invalid request. Please do not repeat this request again.');

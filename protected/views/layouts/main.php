@@ -36,7 +36,7 @@
             'items'=>array(
                 //array('label'=>'Home', 'url'=>'#', 'active'=>true),
                 //array('label'=>'Link', 'url'=>'#'),
-                array('label'=>'Заказы', 'url'=>'#', 'items'=>array(
+                /*array('label'=>'Заказы', 'url'=>'#', 'items'=>array(
                     array('label'=>'Создать', 'url'=>'?r=order/create'),
                     '---',
                     array('label'=>'Реестры'),
@@ -47,18 +47,19 @@
                     array('label'=>'Выполненые', 'url'=>'?r=order/index&status_id=5'),
                     '---',
                     array('label'=>'Калькулятор', 'url'=>'?r=order/calculate'),
-                )),
+                )),*/
                 array('label'=>'Производство', 'url'=>'#', 'items'=>array(
-                    array('label'=>'Заказы'),
-                    array('label'=>'Поступившие', 'url'=>'?r=order/index&status_id=1'),
-                    array('label'=>'В работе', 'url'=>'?r=order/index&status_id=2'),
-                    array('label'=>'На складе', 'url'=>'?r=order/index&status_id=3'),
-                    '---',
+                    //array('label'=>'Заказы'),
+                    //array('label'=>'Поступившие', 'url'=>'?r=order/index&status_id=1'),
+                    //array('label'=>'В работе', 'url'=>'?r=order/index&status_id=2'),
+                    //array('label'=>'На складе', 'url'=>'?r=order/index&status_id=3'),
+                    //'---',
                     array('label'=>'Справочники'),
                     array('label'=>'Продукты', 'url'=>'?r=product/index'),
-                    array('label'=>'Технологические процессы', 'url'=>'?r=productionProcess/index'),
+                    array('label'=>'Процессы', 'url'=>'?r=productionProcess/index'),
                     array('label'=>'Материалы', 'url'=>'?r=material/index'),
                     array('label'=>'Операции', 'url'=>'?r=productionOperation/index'),
+                    array('label'=>'Специальности', 'url'=>'?r=productionOperationMeasurement/index'),
                 )),
             ),
         ),

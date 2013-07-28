@@ -1,7 +1,7 @@
 <?php if (Yii::app()->request->isAjaxRequest): ?>
 <div class="modal-header">
 	<a class="close" data-dismiss="modal">&times;</a>
-	<h4><?php echo $model->isNewRecord ? 'Create ProductionProcessSubprocess' : 'Update ProductionProcessSubprocess #'.$model->id ?></h4>
+	<h4><?php echo $model->isNewRecord ? 'Добавление технологического процесса' : 'Сопутствующий технологический процесс' ?></h4>
 </div>
 
 <div class="modal-body">
@@ -13,15 +13,37 @@
 	'enableAjaxValidation'=>false,
 )); ?>
 
-	<p class="help-block">Fields with <span class="required">*</span> are required.</p>
-
 	<?php echo $form->errorSummary($model); ?>
 
-	<?php echo $form->textFieldRow($model,'parent_price_id',array('class'=>'span5')); ?>
+	<?php echo $form->hiddenField($model,'parent_price_id'); ?>
 
-	<?php echo $form->textFieldRow($model,'price_id',array('class'=>'span5')); ?>
+	<?php echo $form->uneditableRow($model->parent, 'name', array('class'=>'span5')); ?>
 
-	<?php echo $form->textFieldRow($model,'price_count',array('class'=>'span5')); ?>
+    <?php if ($model->isNewRecord): ?>
+        <div class="control-group ">
+            <?php echo $form->label($model, 'price_id', array('class'=>'control-label')); ?>
+            <div class="controls">
+                <?php $this->widget('CAutoComplete', array(
+                    'name'=>'subprocess_name',
+                    'url'=>$this->createUrl('productionProcess/autoCompleteLookup',array('is_folder'=>0)),
+                    'max'=>9, //specifies the max number of items to display
+                    'minChars'=>3,
+                    'delay'=>500, //number of milliseconds before lookup occurs
+                    'matchCase'=>false, //match case when performing a lookup?
+                    'htmlOptions'=>array('class'=>'span5','placeholder'=>'Выберите из списка'),
+                    'methodChain'=>".result(function(event,item){\$(\"#ProductionProcessSubprocess_price_id\").val(item[1]);})",
+                )); ?>
+                <?php echo $form->hiddenField($model,'price_id'); ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <?php echo $form->uneditableRow($model->process,'name',array(
+            'class'=>'span5',
+            'labelOptions'=>array('label' => 'Технологичекий процесс'),
+        )); ?>
+    <?php endif; ?>
+
+    <?php echo $form->textFieldRow($model,'price_count',array('class'=>'span5')); ?>
 
 	<?php if (!Yii::app()->request->isAjaxRequest): ?>
 	<div class="form-actions">

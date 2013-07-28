@@ -60,3 +60,36 @@
         ),
     ));
 ?>
+
+<?php
+    $this->widget('bootstrap.widgets.TbButtonGroup', array(
+        'buttons'=>array(
+            array(
+                'label'=>'Добавить',
+                'icon'=>'plus',
+                'items'=>array(
+                    array(
+                        'label'=>'Операцию',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("productionOperation/create", array("parent_id"=>$parent_id,"is_folder"=>0)),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                    array(
+                        'label'=>'Группу',
+                        'url'=>'#',
+                        'linkOptions'=>array(
+                            'ajax' => array(
+                                'url'=>Yii::app()->createUrl("productionOperation/create", array("parent_id"=>$parent_id,'is_folder'=>1)),
+                                'success'=>'function(r){$("#TBDialogCrud").html(r).modal("show");}', 
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    ));
+?>

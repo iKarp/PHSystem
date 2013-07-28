@@ -64,6 +64,11 @@ class ProductionProcessSubprocessController extends Controller
 	{
 		$model=new ProductionProcessSubprocess;
 
+        if(isset($_GET['ProductionProcessID'])){
+            $model->parent = ProductionProcess::model()->findByPk($_GET['ProductionProcessID']);
+            $model->parent_price_id = $_GET['ProductionProcessID'];
+        }
+
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 		
