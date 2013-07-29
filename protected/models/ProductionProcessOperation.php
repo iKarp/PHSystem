@@ -61,6 +61,8 @@ class ProductionProcessOperation extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
             'operation' => array(self::HAS_ONE, 'ProductionOperation', array('id'=>'work_id')),
+            'process' => array(self::BELONGS_TO, 'ProductionProcess', array('price_id'=>'id')),
+            //'process' => array(self::HAS_ONE, 'ProductionProcess', array('id'=>'price_id')),
 		);
 	}
 
@@ -72,8 +74,8 @@ class ProductionProcessOperation extends CActiveRecord
 		return array(
 			'relation_id' => 'Relation',
 			'price_id' => 'Price',
-			'work_id' => 'Work',
-			'work_count' => 'Work Count',
+			'work_id' => 'Операция',
+			'work_count' => 'Количество',
 		);
 	}
 

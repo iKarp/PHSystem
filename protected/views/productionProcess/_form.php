@@ -92,7 +92,25 @@
             array('name'=>'operation.measurement.cost', 'header'=>'Стоимость н/ч'),
             array('value'=>'sprintf("%.6f",1/$data->operation->hours)', 'header'=>'Выработка в час'),
             array('value'=>'sprintf("%.6f",$data->work_count*$data->operation->measurement->cost*$data->operation->hours)', 'header'=>'Сумма'),
-            array('class'=>'bootstrap.widgets.TbButtonColumn','template'=>'{delete}',)
+            array(
+                'class'=>'bootstrap.widgets.TbButtonColumn',
+                'template'=>'{update}{delete}',
+                'buttons'=>array(
+                    'delete' => array(
+                        'url'=>'Yii::app()->createUrl("productionProcessOperation/delete", array("id"=>$data->id))',  
+                    ),
+                    'update' => array(
+                        'url'=>'Yii::app()->createUrl("productionProcessOperation/update", array("id"=>$data->id))',
+                        'click'=>'function(){
+                            var url = $(this).attr("href");
+                            $.get(url, function(r){
+                                $("#TBDialogCrud").html(r).modal("show");
+                            });
+                            return false;
+                        }',
+                    ),
+                ),
+            ),
         ),
     )); ?>
 
