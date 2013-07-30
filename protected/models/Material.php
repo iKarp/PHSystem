@@ -48,7 +48,7 @@ class Material extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('price', 'required'),
+			//array('price', 'required'),
 			array('parent_id, is_folder, is_active, measurement_id', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>50),
 			array('description', 'length', 'max'=>255),
