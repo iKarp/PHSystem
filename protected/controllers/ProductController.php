@@ -31,7 +31,7 @@ class ProductController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','autoCompleteLookup','calc'),
+				'actions'=>array('create','update','autoCompleteLookup','consist'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -81,12 +81,17 @@ class ProductController extends Controller
 		));
 	}
     
-    public function actionCalc($id)
+    public function actionConsist($id)
 	{
 		$model = $this->loadModel($id);
-        if ($model->isProduct()) $model->calculateCount($model->count); else $model->calculate();
+        $model->calculateConsist($model->count);
+        $consist = $model->getConsist();
+        $materials = new CArrayDataProvider($consist['materials']);
+        $operations = new CArrayDataProvider($consist['operations']);
         $this->render('calc',array(
 			'model'=>$model,
+            'materials'=>$materials,
+            'operations'=>$operations,
 		));
 	}
 

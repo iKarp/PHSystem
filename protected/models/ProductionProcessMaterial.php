@@ -35,7 +35,8 @@ class ProductionProcessMaterial extends CActiveRecord
     public function calculate(){
         $this->cost = $this->material->price * $this->material_count;
     }
-	/**
+    
+    /**
 	 * @return array validation rules for model attributes.
 	 */
 	public function rules()

@@ -26,6 +26,7 @@ class ProductionProcess extends CActiveRecord
 {
 
     public $cost = array();
+    public $consist = array();
 
     /**
 	 * Returns the static model of the specified AR class.
@@ -86,19 +87,24 @@ class ProductionProcess extends CActiveRecord
     
     }
     
-    public function calculateConsist(&$data){
+    public function calculateConsist($count){
         
         foreach ($this->materials as $material) {
-            $material->calculate();
-            if (isset($data['m'][$material->id]))
-                $data['m'][$material->id] += $material->cost;
-            else
-                $data['m'][$material->id] = $material->cost;
+            if (!isset($this->consist['m'][$material->material->id])) $this->consist['m'][$material->material->id] = 0;
+            $this->consist['m'][$material->material->id] += $material->material_count * $count;
         }
         
         foreach ($this->operations as $operation) {
-            $operation->calculate();
-            $this->cost['operations'] += $operation->cost;
+            if (!isset($this->consist['o'][$operation->operation->id])) $this->consist['o'][$operation->operation->id] = 0;
+            $this->consist['o'][$operation->operation->id] += $operation->work_count * $count;
+        }
+        
+        foreach ($this->subprocesses as $subprocess) {
+            $subprocess->process->calculateConsist($subprocess->price_count);
+            Product::mergeConsist($this->consist, $subprocess->process->consist, 1);        }
+        
+        /*foreach ($this->operations as $operation) {
+            $operation->consist($data['m'], $count);
         }
         
         foreach ($this->subprocesses as $subprocess) {
@@ -109,7 +115,7 @@ class ProductionProcess extends CActiveRecord
         $this->cost['overhead'] = $this->cost['materials'] * Yii::app()->params['overheadCost'] / 100;
         $this->cost['taxSalary'] = $this->cost['operations'] * Yii::app()->params['taxSalary'] / 100;
         $this->cost['var'] = $this->cost['operations'] + $this->cost['taxSalary'] + $this->cost['materials'] + $this->cost['overhead'];
-        
+        */
     }
     
     public function getPath(){

@@ -24,6 +24,11 @@ class Product extends CActiveRecord
 	 * @return Product the static model class
 	 */
     public $cost;
+    public $consist = array(
+        'm' => array(),
+        'o' => array(),
+        'c' => array(),
+    );
     
 	public static function model($className=__CLASS__)
 	{
@@ -90,11 +95,67 @@ class Product extends CActiveRecord
     
     }
     
-    public function calculateConsistence($count){
+    public function calculateConsist($count){
     
-        $this->calculate();
-        $this->cost['total'] = $this->cost['fix'] + $this->cost['var'] * $count;
+        foreach ($this->processes as $item) {
+            $item->process->calculateConsist($count * $item->count);
+            Product::mergeConsist($this->consist, $item->process->consist, 1);
+        }
+        
+        if ($this->isProduct())
+            foreach ($this->semiproducts as $item) {
+                $item->semiproduct->calculateConsist($count * $item->count + $item->semiproduct->count);
+                Product::mergeConsist($this->consist, $item->semiproduct->consist, 1);
+            }
     
+    }
+    
+    public function getConsist(){
+    
+        $data = array(
+            'materials'=>array(),
+            'operations'=>array(),
+        );
+        foreach ($this->consist['m'] as $mID => $mCount){
+            $material = Material::model()->findByPk($mID);
+            $data['materials'][] = array(
+                'name'=>$material->name,
+                'measurement'=>$material->measurement->name,
+                'price'=>$material->price,
+                'count'=>$mCount,
+                'total'=>$mCount*$material->price,
+            );
+        }
+        foreach ($this->consist['o'] as $oID => $oCount){
+            $operation = ProductionOperation::model()->findByPk($oID);
+            $data['operations'][] = array(
+                'name'=>$operation->name,
+                'measurement'=>$operation->measurement->name,
+                'price'=>$operation->measurement->cost / $operation->productivity,
+                'count'=>$oCount,
+                'total'=>$oCount * $operation->measurement->cost / $operation->productivity,
+            );
+        }
+        return $data;
+        
+    }
+
+    public function mergeConsist(&$base, &$append, $count = 1){
+        if (isset($append['m'])){
+            foreach ($append['m'] as $key => $value) {
+                if (!isset($base['m'][$key])) $base['m'][$key] = 0;
+                $base['m'][$key] += $count * $value;
+            }
+        }
+        else return false;
+        if (isset($append['o'])){
+            foreach ($append['o'] as $key => $value) {
+                if (!isset($base['o'][$key])) $base['o'][$key] = 0;
+                $base['o'][$key] += $count * $value;
+            }
+        }
+        else return false;
+        return true;
     }
 
     public function breadcrumbs(){

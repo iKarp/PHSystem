@@ -53,6 +53,15 @@ $this->menu=array(
                     array('value'=>'sprintf("%.6f",$data->semiproduct->cost["var"])', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100')),
                     array('value'=>'sprintf("%.6f",$data->semiproduct->cost["fix"])', 'header'=>'Техпроцесс', 'htmlOptions'=>array('width'=>'120')),
                     array('value'=>'sprintf("%.6f",$data->semiproduct->cost["total"])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
+                    array(
+                        'class'=>'bootstrap.widgets.TbButtonColumn',
+                        'template'=>'{view}',
+                        'buttons'=>array(
+                            'view' => array(
+                                'url'=>'Yii::app()->createUrl("product/view", array("id"=>$data->semiproduct->id))',  
+                            ),
+                        ),
+                    ),
                 ),
             ));
     ?>
@@ -66,6 +75,15 @@ $this->menu=array(
     $colums[] = array('value'=>'sprintf("%.6f",$data->process->cost["var"])', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100'));
     $colums[] = array('value'=>'sprintf("%.6f",$data->process->cost["fix"])', 'header'=>'Техпроцесс', 'htmlOptions'=>array('width'=>'120'));
     if ($model->isProduct()) $colums[] = array('value'=>'sprintf("%.6f",$data->process->cost["total"])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120'));
+    $colums[] = array(
+        'class'=>'bootstrap.widgets.TbButtonColumn',
+        'template'=>'{view}',
+        'buttons'=>array(
+            'view' => array(
+                'url'=>'Yii::app()->createUrl("productionProcess/view", array("id"=>$data->process->id))',
+            ),
+        ),
+    );
     $this->widget('bootstrap.widgets.TbGridView', array(
         'type'=>'striped condensed',
         'dataProvider'=>$processes,
@@ -85,7 +103,7 @@ $this->menu=array(
     $this->widget('bootstrap.widgets.TbButton', array(
         'label'=>'Калькуляция',
         'icon'=>'list',
-        'url'=>Yii::app()->createUrl("product/calc", array("id"=>$model->id)),
+        'url'=>Yii::app()->createUrl("product/consist", array("id"=>$model->id)),
     ));
 ?>
 <?php

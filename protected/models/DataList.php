@@ -71,7 +71,7 @@ class DataList extends CActiveRecord
 			'position' => 'Position',
 		);
 	}
-
+    
     private static $_items=array();
  
     public static function items($type)
