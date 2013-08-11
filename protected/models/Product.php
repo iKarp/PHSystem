@@ -89,6 +89,13 @@ class Product extends CActiveRecord
         $this->cost['total'] = $this->cost['fix'] + $this->cost['var'] * $count;
     
     }
+    
+    public function calculateConsistence($count){
+    
+        $this->calculate();
+        $this->cost['total'] = $this->cost['fix'] + $this->cost['var'] * $count;
+    
+    }
 
     public function breadcrumbs(){
         $breadcrumbs = array();

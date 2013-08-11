@@ -86,6 +86,32 @@ class ProductionProcess extends CActiveRecord
     
     }
     
+    public function calculateConsist(&$data){
+        
+        foreach ($this->materials as $material) {
+            $material->calculate();
+            if (isset($data['m'][$material->id]))
+                $data['m'][$material->id] += $material->cost;
+            else
+                $data['m'][$material->id] = $material->cost;
+        }
+        
+        foreach ($this->operations as $operation) {
+            $operation->calculate();
+            $this->cost['operations'] += $operation->cost;
+        }
+        
+        foreach ($this->subprocesses as $subprocess) {
+            $subprocess->calculate();
+            $this->cost['fix'] += $subprocess->cost;
+        }
+        
+        $this->cost['overhead'] = $this->cost['materials'] * Yii::app()->params['overheadCost'] / 100;
+        $this->cost['taxSalary'] = $this->cost['operations'] * Yii::app()->params['taxSalary'] / 100;
+        $this->cost['var'] = $this->cost['operations'] + $this->cost['taxSalary'] + $this->cost['materials'] + $this->cost['overhead'];
+        
+    }
+    
     public function getPath(){
         $path = '';
         $parent_id = $this->parent_id;

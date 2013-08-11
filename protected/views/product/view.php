@@ -83,6 +83,13 @@ $this->menu=array(
 ?>
 <?php
     $this->widget('bootstrap.widgets.TbButton', array(
+        'label'=>'Калькуляция',
+        'icon'=>'list',
+        'url'=>Yii::app()->createUrl("product/calc", array("id"=>$model->id)),
+    ));
+?>
+<?php
+    $this->widget('bootstrap.widgets.TbButton', array(
         'label'=>'К списку',
         'icon'=>'list',
         'url'=>Yii::app()->createUrl("product/index", array("parent_id"=>$model->parent_id)),

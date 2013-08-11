@@ -31,7 +31,7 @@ class ProductController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('create','update','autoCompleteLookup'),
+				'actions'=>array('create','update','autoCompleteLookup','calc'),
 				'users'=>array('@'),
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
@@ -77,6 +77,15 @@ class ProductController extends Controller
 		$model = $this->loadModel($id);
         if ($model->isProduct()) $model->calculateCount($model->count); else $model->calculate();
         $this->render('view',array(
+			'model'=>$model,
+		));
+	}
+    
+    public function actionCalc($id)
+	{
+		$model = $this->loadModel($id);
+        if ($model->isProduct()) $model->calculateCount($model->count); else $model->calculate();
+        $this->render('calc',array(
 			'model'=>$model,
 		));
 	}
