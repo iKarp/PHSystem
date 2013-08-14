@@ -86,8 +86,8 @@ class ProductController extends Controller
 		$model = $this->loadModel($id);
         $model->calculateConsist($model->count);
         $consist = $model->getConsist();
-        $materials = new CArrayDataProvider($consist['materials']);
-        $operations = new CArrayDataProvider($consist['operations']);
+        $materials = new CArrayDataProvider($consist['materials'],array('pagination'=>array('pageSize'=>50)));
+        $operations = new CArrayDataProvider($consist['operations'],array('pagination'=>array('pageSize'=>50)));
         $this->render('calc',array(
 			'model'=>$model,
             'materials'=>$materials,

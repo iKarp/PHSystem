@@ -119,28 +119,30 @@ class Product extends CActiveRecord
         foreach ($this->consist['m'] as $mID => $mCount){
             $material = Material::model()->findByPk($mID);
             $data['materials'][] = array(
+                'id'=>$mID,
                 'name'=>$material->name,
                 'measurement'=>$material->measurement->name,
-                'price'=>$material->price,
-                'count'=>$mCount,
-                'total'=>$mCount*$material->price,
+                'price'=>sprintf("%.2f",$material->price),
+                'count'=>sprintf("%.2f",$mCount),
+                'total'=>sprintf("%.2f",$mCount*$material->price),
             );
         }
         foreach ($this->consist['o'] as $oID => $oCount){
             $operation = ProductionOperation::model()->findByPk($oID);
             $data['operations'][] = array(
+                'id'=>$oID,
                 'name'=>$operation->name,
                 'measurement'=>$operation->measurement->name,
-                'price'=>$operation->measurement->cost / $operation->productivity,
-                'count'=>$oCount,
-                'total'=>$oCount * $operation->measurement->cost / $operation->productivity,
+                'price'=>sprintf("%.2f",$operation->measurement->cost / $operation->productivity),
+                'count'=>sprintf("%.2f",$oCount),
+                'total'=>sprintf("%.2f",$oCount * $operation->measurement->cost / $operation->productivity),
             );
         }
         return $data;
         
     }
 
-    public function mergeConsist(&$base, &$append, $count = 1){
+    public static function mergeConsist(&$base, &$append, $count = 1){
         if (isset($append['m'])){
             foreach ($append['m'] as $key => $value) {
                 if (!isset($base['m'][$key])) $base['m'][$key] = 0;

@@ -31,9 +31,8 @@
             array('name'=>'name', 'header'=>'Материалы'),
             array('name'=>'measurement', 'header'=>'Ед. изм.'),
             array('name'=>'count', 'header'=>'Кол-во'),
-            array('value'=>'sprintf("%.2f",$data[price])', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100')),
-            array('value'=>'sprintf("%.2f",$data[total])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
-            //array('value'=>'sprintf("%.6f",$data->semiproduct->cost["total"])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
+            array('name'=>'price', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100')),
+            array('name'=>'total', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
         ),
     ));
 ?>
@@ -47,8 +46,8 @@
             array('name'=>'name', 'header'=>'Операции'),
             array('name'=>'measurement', 'header'=>'Ед. изм.'),
             array('name'=>'count', 'header'=>'Кол-во'),
-            array('value'=>'sprintf("%.2f",$data[price])', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100')),
-            array('value'=>'sprintf("%.2f",$data[total])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
+            array('name'=>'price', 'header'=>'Цена', 'htmlOptions'=>array('width'=>'100')),
+            array('name'=>'total', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
             //array('value'=>'sprintf("%.6f",$data->semiproduct->cost["total"])', 'header'=>'Сумма', 'htmlOptions'=>array('width'=>'120')),
         ),
     ));

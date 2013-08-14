@@ -26,8 +26,12 @@ class ProductionProcess extends CActiveRecord
 {
 
     public $cost = array();
-    public $consist = array();
-
+    public $consist = array(
+        'm' => array(),
+        'o' => array(),
+        'c' => array(),
+    );
+    
     /**
 	 * Returns the static model of the specified AR class.
 	 * @param string $className active record class name.
@@ -101,7 +105,8 @@ class ProductionProcess extends CActiveRecord
         
         foreach ($this->subprocesses as $subprocess) {
             $subprocess->process->calculateConsist($subprocess->price_count);
-            Product::mergeConsist($this->consist, $subprocess->process->consist, 1);        }
+            Product::mergeConsist($this->consist, $subprocess->process->consist, 1);
+        }
         
         /*foreach ($this->operations as $operation) {
             $operation->consist($data['m'], $count);
